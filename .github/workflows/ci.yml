@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  buddykit:
+    name: BuddyKit (swift test)
+    runs-on: ubuntu-latest
+    container: swift:5.10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run BuddyKit unit tests
+        working-directory: BuddyKit
+        run: swift test
+
+  worker:
+    name: Worker (vitest + typecheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        working-directory: worker
+        run: npm ci
+      - name: Typecheck
+        working-directory: worker
+        run: npm run typecheck
+      - name: Run Worker unit tests
+        working-directory: worker
+        run: npm test
