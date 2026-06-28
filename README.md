@@ -72,7 +72,7 @@ log in [`docs/phase-1.md`](./docs/phase-1.md) … [`docs/phase-5.md`](./docs/pha
 
 - macOS 14.2 or later (ScreenCaptureKit screenshot API)
 - Xcode 15.4+ and Swift 5.9+
-- [XcodeGen](https://github.com/yonsei/XcodeGen) (`brew install xcodegen`) to generate the project
+- [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`) to generate the project
 - Node.js 18+ for the Cloudflare Worker
 - A Cloudflare account with Workers AI enabled
 
@@ -95,6 +95,14 @@ Point the app at your deployed Worker by setting the proxy URL — either edit `
 
 ```bash
 defaults write com.ishaangupta.buddy BuddyProxyURL "https://buddy-proxy.<your-subdomain>.workers.dev"
+```
+
+If you locked the Worker with a `BUDDY_PROXY_SECRET` (recommended — see below), give the app the
+matching bearer token so its requests are authorized. The secret is read from a user default and
+never committed into the app bundle:
+
+```bash
+defaults write com.ishaangupta.buddy BuddyProxySecret "<the same value you set with wrangler secret>"
 ```
 
 ## Deploy the Cloudflare Worker
