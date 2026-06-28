@@ -9,8 +9,10 @@ import Foundation
 /// be used to ship credentials in a distributed build.
 public enum WorkersAIEndpointMode: Equatable, Sendable {
     /// Talk to the Buddy Worker proxy at the given base URL (recommended for shipping).
-    /// The proxy exposes `/chat`, `/transcribe`, and `/tts` routes.
-    case workerProxy(baseURL: URL)
+    /// The proxy exposes `/chat`, `/transcribe`, and `/tts` routes. When the proxy is
+    /// locked with a shared `BUDDY_PROXY_SECRET`, `proxySecret` is the matching bearer
+    /// token the app must present; pass `nil` for an unauthenticated proxy.
+    case workerProxy(baseURL: URL, proxySecret: String?)
 
     /// Talk directly to the Cloudflare REST API for the given account using a bearer token.
     /// Intended for development only — never embed a real token in a shipped app.
@@ -68,7 +70,7 @@ public struct WorkersAIEndpointResolver: Sendable {
     /// The URL for the OpenAI-compatible streaming chat-completions route.
     public func chatCompletionsURL() -> URL {
         switch endpointMode {
-        case .workerProxy(let baseURL):
+        case .workerProxy(let baseURL, _):
             return baseURL.appendingPathComponent("chat")
         case .directCloudflare(let accountIdentifier, _):
             return cloudflareBaseURL(forAccount: accountIdentifier)
@@ -79,7 +81,7 @@ public struct WorkersAIEndpointResolver: Sendable {
     /// The URL for the speech-to-text (Whisper) route.
     public func speechToTextURL() -> URL {
         switch endpointMode {
-        case .workerProxy(let baseURL):
+        case .workerProxy(let baseURL, _):
             return baseURL.appendingPathComponent("transcribe")
         case .directCloudflare(let accountIdentifier, _):
             return cloudflareBaseURL(forAccount: accountIdentifier)
@@ -90,7 +92,7 @@ public struct WorkersAIEndpointResolver: Sendable {
     /// The URL for the text-to-speech (MeloTTS) route.
     public func textToSpeechURL() -> URL {
         switch endpointMode {
-        case .workerProxy(let baseURL):
+        case .workerProxy(let baseURL, _):
             return baseURL.appendingPathComponent("tts")
         case .directCloudflare(let accountIdentifier, _):
             return cloudflareBaseURL(forAccount: accountIdentifier)
@@ -98,12 +100,13 @@ public struct WorkersAIEndpointResolver: Sendable {
         }
     }
 
-    /// The bearer token to send, or `nil` when talking to the proxy (the proxy injects
-    /// the real credential server-side).
+    /// The bearer token to send. In proxy mode this is the shared `BUDDY_PROXY_SECRET`
+    /// (the proxy injects the real Cloudflare credential server-side), or `nil` when the
+    /// proxy is unauthenticated. In direct mode it is the Cloudflare API token.
     public func bearerToken() -> String? {
         switch endpointMode {
-        case .workerProxy:
-            return nil
+        case .workerProxy(_, let proxySecret):
+            return proxySecret
         case .directCloudflare(_, let apiToken):
             return apiToken
         }

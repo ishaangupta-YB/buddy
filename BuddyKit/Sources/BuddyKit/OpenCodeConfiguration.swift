@@ -41,7 +41,11 @@ public enum OpenCodeConfiguration {
         let providerEntry: [String: Any] = [
             "npm": openAICompatibleNPMPackage,
             "name": providerDisplayName,
-            "options": ["baseURL": openAICompatibleBaseURL(forAccount: accountIdentifier)],
+            "options": [
+                "baseURL": openAICompatibleBaseURL(forAccount: accountIdentifier),
+                // OpenCode reads the Workers AI scoped token from the environment at runtime.
+                "apiKey": "${CLOUDFLARE_API_KEY}"
+            ],
             "models": modelEntries
         ]
 
