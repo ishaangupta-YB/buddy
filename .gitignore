@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+
+# Xcode
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+xcuserdata/
+DerivedData/
+build/
+*.xcuserstate
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# Node / Cloudflare Worker
+node_modules/
+.wrangler/
+dist/
+
+# Secrets — never commit
+.dev.vars
+*.env
+.env
+secrets.json
+
+# Logs
+*.log
