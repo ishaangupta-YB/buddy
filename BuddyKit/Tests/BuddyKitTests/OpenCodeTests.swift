@@ -24,6 +24,7 @@ final class OpenCodeConfigurationTests: XCTestCase {
             options?["baseURL"] as? String,
             "https://api.cloudflare.com/client/v4/accounts/acct123/ai/v1"
         )
+        XCTAssertEqual(options?["apiKey"] as? String, "${CLOUDFLARE_API_KEY}")
 
         let models = provider?["models"] as? [String: Any]
         XCTAssertNotNil(models?["@cf/moonshotai/kimi-k2.7-code"])

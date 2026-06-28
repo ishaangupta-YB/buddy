@@ -45,6 +45,9 @@ account token as a secret and runs models via its bound `AI` binding.
 
 Worker secret: `BUDDY_PROXY_SECRET` (shared bearer token). Worker var: `DEFAULT_CHAT_MODEL`.
 The Worker enforces a model allowlist — requests for anything off-list are coerced to the default.
+The app sends the matching bearer token, read from the `BuddyProxySecret` user default (see
+`AppConfiguration.workerProxySecret()`); it is never committed into the bundle. When the proxy
+runs without a secret, the app sends no `Authorization` header and the Worker skips the check.
 
 ## Key files
 

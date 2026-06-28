@@ -6,9 +6,12 @@ import XCTest
 @testable import BuddyKit
 
 final class WorkersAIClientTests: XCTestCase {
-    private func makeProxyConfiguration() -> BuddyConfiguration {
+    private func makeProxyConfiguration(proxySecret: String? = nil) -> BuddyConfiguration {
         BuddyConfiguration(
-            endpointMode: .workerProxy(baseURL: URL(string: "https://buddy-proxy.example.workers.dev")!)
+            endpointMode: .workerProxy(
+                baseURL: URL(string: "https://buddy-proxy.example.workers.dev")!,
+                proxySecret: proxySecret
+            )
         )
     }
 
@@ -121,5 +124,37 @@ final class WorkersAIClientTests: XCTestCase {
             "https://api.cloudflare.com/client/v4/accounts/acct123/ai/run/@cf/openai/whisper-large-v3-turbo"
         )
         XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer secret-token")
+    }
+
+    func testWorkerProxyModeSendsBearerSecretWhenConfigured() async throws {
+        let transport = MockHTTPTransport()
+        transport.nextBufferedResponse = MockHTTPTransport.BufferedResponse(
+            data: Data("{\"text\":\"hi\"}".utf8),
+            metadata: HTTPResponseMetadata(statusCode: 200, contentType: "application/json")
+        )
+        let client = WorkersAIClient(
+            configuration: makeProxyConfiguration(proxySecret: "shared-proxy-secret"),
+            transport: transport
+        )
+
+        _ = try await client.transcribeSpeech(audioData: Data([0x00]))
+        let request = try XCTUnwrap(transport.receivedRequests.last)
+        XCTAssertEqual(
+            request.value(forHTTPHeaderField: "Authorization"),
+            "Bearer shared-proxy-secret"
+        )
+    }
+
+    func testWorkerProxyModeOmitsAuthorizationWhenNoSecretConfigured() async throws {
+        let transport = MockHTTPTransport()
+        transport.nextBufferedResponse = MockHTTPTransport.BufferedResponse(
+            data: Data("{\"text\":\"hi\"}".utf8),
+            metadata: HTTPResponseMetadata(statusCode: 200, contentType: "application/json")
+        )
+        let client = WorkersAIClient(configuration: makeProxyConfiguration(), transport: transport)
+
+        _ = try await client.transcribeSpeech(audioData: Data([0x00]))
+        let request = try XCTUnwrap(transport.receivedRequests.last)
+        XCTAssertNil(request.value(forHTTPHeaderField: "Authorization"))
     }
 }
