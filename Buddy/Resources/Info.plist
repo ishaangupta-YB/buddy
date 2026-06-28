@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>Buddy</string>
+    <key>CFBundleDisplayName</key>
+    <string>Buddy</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.ishaangupta.buddy</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>14.2</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2026 Ishaan Gupta. MIT License.</string>
+
+    <!-- Menu-bar-only app: no dock icon and no main window. -->
+    <key>LSUIElement</key>
+    <true/>
+
+    <!-- The Buddy Worker proxy base URL. Override at runtime via the BuddyProxyURL UserDefault. -->
+    <key>BuddyProxyURL</key>
+    <string>https://buddy-proxy.example.workers.dev</string>
+
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Buddy listens to your voice while you hold the push-to-talk shortcut so it can answer you.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>Buddy transcribes your speech to understand your questions.</string>
+</dict>
+</plist>
